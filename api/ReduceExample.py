@@ -2,8 +2,6 @@ import Communication
 import numpy as np
 import threading
 from concurrent.futures import ThreadPoolExecutor
-import concurrent.futures
-
 
 
 class ReduceExample:
