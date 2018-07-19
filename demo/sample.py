@@ -11,10 +11,10 @@ class Initial:
 
         if rank == 0:
             data = {'a': 7, 'b': 3.14}
-            comm.send(data, dest=1, tag=11)
+            comm.isend(data, dest=1, tag=11)
             print("Sending : " + str(data) + ": Rank " + str(rank))
         elif rank == 1:
-            data = comm.recv(source=0, tag=11)
+            data = comm.irecv(source=0, tag=11)
             print("Receiving : " + str(data) + ": Rank " + str(rank))
 
 

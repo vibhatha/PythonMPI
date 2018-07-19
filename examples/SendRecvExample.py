@@ -8,11 +8,11 @@ class SendRecvExample:
 
         if (rank == 0):
             input = [0,1,2,3,4]
-            self.comms.send(input=input, dest=1, tag=11)
+            self.comms.isend(input=input, dest=1, tag=11)
             print("Sending Data : " + str(input) + "from Rank " + str(rank))
 
         elif (rank == 1):
-            data = self.comms.recv(source=0, tag=11)
+            data = self.comms.irecv(source=0, tag=11)
             print("Receiving Data : " + str(data) + "from Rank " + str(rank))
 
 
