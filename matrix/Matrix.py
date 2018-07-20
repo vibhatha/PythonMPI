@@ -14,3 +14,7 @@ class Matrix:
 
     def gen_distance_matrix(self,x, y, p=2, threashold=1000000):
         return distance_matrix(x=x, y=y, p=p , threshold=threashold)
+
+    def get_matrix(self, array=np.empty(1)):
+        matrix = np.matrix(array, copy=True)
+        return matrix
