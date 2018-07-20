@@ -1,4 +1,6 @@
-import Communication
+import sys
+sys.path.append('/home/vibhatha/github/bio/PythonMPI')
+from comms import Communication
 import numpy as np
 import threading
 from concurrent.futures import ThreadPoolExecutor

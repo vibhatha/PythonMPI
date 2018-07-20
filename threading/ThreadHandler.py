@@ -17,4 +17,4 @@ class ThreadHandler(threading.Thread):
         #self.object.execute()
 
 
-threadHandler = ThreadHandler("1", ThreadImpl)
+#threadHandler = ThreadHandler("1", ThreadImpl)

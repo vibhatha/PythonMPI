@@ -1,6 +1,8 @@
+import sys
+sys.path.append('/home/vibhatha/github/bio/PythonMPI')
 from mpi4py import MPI
 import numpy as np
-import Constant
+from api import Constant
 
 class Communication:
     mpi = MPI
