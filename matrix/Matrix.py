@@ -1,4 +1,6 @@
 import numpy as np
+import scipy as sp
+from scipy.spatial import distance_matrix
 
 class Matrix:
     rows = 0
@@ -8,3 +10,7 @@ class Matrix:
         data = np.empty(shape=[rows,columns], dtype=dtype)
         matrix = np.matrix(data, dtype=dtype, copy=True)
         return matrix
+
+
+    def gen_distance_matrix(self,x, y, p=2, threashold=1000000):
+        return distance_matrix(x=x, y=y, p=p , threshold=threashold)

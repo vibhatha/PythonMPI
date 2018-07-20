@@ -9,5 +9,8 @@ class MatrixImpl:
         columns = 3
         matA = self.matrix.init_matrix(rows=rows, columns=columns, dtype=int)
         print(matA)
+
+
+
 matrixImpl = MatrixImpl()
 matrixImpl.gen_matrix()
