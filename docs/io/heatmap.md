@@ -1,4 +1,4 @@
-HAET MAP GENERATION
+Heat Map Generation
 *******************
 
 # HAET MAP GENERATION
@@ -10,6 +10,7 @@ HAET MAP GENERATION
 3. 15x15 = Exec Time : 532.976430893
 
 ## Parallel Generation
+
 1. 10x10   = Execution Time : 78.9649090767 s
 2. 15x15   = Execution Time : 199.766344786 s
 3. 25x25   = Execution Time : 497.969747066 s
