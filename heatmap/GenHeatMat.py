@@ -97,7 +97,7 @@ const = Constant.Constant()
 gen = GenHeatMap(real_mat=const.DISTANCE_MATRIX_MAT_PATH, mds_mat=const.MDS_DISTANCE_MATRIX_MAT_PATH)
 realMat, mdsMat = gen.load_matrices()
 #gen.pair_distances(realMat=[[1,2,3,4,5],[1,2,3,4,5]][0], mdsMat=[[5,4,3,2,1],[5,4,3,2,1]][0])
-
+print(realMat.shape)
 
 pointsX, pointsY = gen.pair_distances(realMat=realMat, mdsMat=mdsMat)
 
@@ -105,7 +105,7 @@ print(len(pointsX), len(pointsX))
 
 minVal, maxVal = gen.get_min_max(matrixA=realMat, matrixB=mdsMat)
 
-grid_size = 2
+grid_size = 15
 
 step = (maxVal - minVal) / grid_size
 
@@ -115,17 +115,19 @@ print(minVal, maxVal)
 
 
 
+
+
 exec_time = 0
 exec_time -= time.time()
 box = gen.gen_heatmap(pointsX=pointsX, pointsY=pointsY, step=step, minVal=minVal, maxVal=maxVal, box_size=grid_size)
 exec_time += time.time()
-#print(box)
+print(box)
 
 sum = np.sum(box)
 print("Total Points: ",sum)
-print("Exec Time : " + str(exec_time))
+print("Exec Time : " + str(exec_time) + "s")
 heat_grid = np.reshape(box, newshape=(grid_size,grid_size))
-ax = sns.heatmap(heat_grid)
+ax = sns.heatmap(heat_grid, annot=True, fmt="d")
 
 plt.show()
 

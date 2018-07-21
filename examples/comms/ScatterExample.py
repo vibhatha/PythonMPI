@@ -10,9 +10,8 @@ class ScatterExample:
     def example(self):
         rank = self.comms.comm.Get_rank()
         size = self.comms.comm.Get_size()
-        num_of_data_per_rank = 2
-        dt_size = range = size * num_of_data_per_rank
-        input = np.linspace(1, range, dt_size , dtype='i')
+        num_of_data_per_rank = 8
+        input = np.array([[1, 2, 3, 4, 5, 6, 7, 8],[1, 3, 5, 7, 9, 11, 13, 15]], np.int32)
         recvbuf = np.empty(num_of_data_per_rank, dtype='i')
         self.comms.scatter(input=input, recvbuf=recvbuf, dtype=self.comms.mpi.INT, root=0)
         if (rank == 0):
