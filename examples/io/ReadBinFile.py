@@ -8,10 +8,10 @@ import time
 
 class ReadBinFile:
 
-    save_path = '/home/vibhatha/Sandbox/bio/distance_matrices/dis.mat'
+    save_path = Constant.Constant().MDS_DISTANCE_MATRIX_MAT_PATH
 
     def read(self):
-        filepath = Constant.Constant().DISTANCE_MATRIX_PATH
+        filepath = Constant.Constant().MDS_DISTANCE_MATRIX_PATH
         fileReader = FileRead.FileRead()
         content = fileReader.read(filepath=filepath)
         length = fileReader.lenth(filepath=filepath)
@@ -19,7 +19,7 @@ class ReadBinFile:
         return content, length, arr
 
     def get_distance_matrix(self):
-        filepath = Constant.Constant().DISTANCE_MATRIX_PATH
+        filepath = Constant.Constant().MDS_DISTANCE_MATRIX_PATH
         fileReader = FileRead.FileRead()
         arr = fileReader.get_array_from_csv(filepath=filepath)
         matrix = Matrix.Matrix()

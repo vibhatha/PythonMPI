@@ -1,5 +1,6 @@
 import sys
 from numpy import genfromtxt
+import numpy as np
 
 class FileRead:
     filepath = '/home/vibhatha/github/dsc-spidal-forks/applications/fungi-gene-sequence/data/distance_matrix.bin'
@@ -16,5 +17,5 @@ class FileRead:
             return i+1
 
     def get_array_from_csv(self,filepath):
-        arr = genfromtxt(filepath, delimiter=',')
+        arr = genfromtxt(filepath, delimiter=',', dtype=np.float64)
         return arr

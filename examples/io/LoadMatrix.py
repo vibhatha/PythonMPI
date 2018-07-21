@@ -1,20 +1,36 @@
+import sys
+sys.path.append('/home/vibhatha/github/bio/PythonMPI')
 import scipy.io as sio
-import numpy as np
 import time
+from api import Constant
+
 
 class LoadMatrix:
 
-    mat_path = '/home/vibhatha/Sandbox/bio/distance_matrices/dis.mat'
+    const = Constant.Constant()
+    mds_mat = const.MDS_DISTANCE_MATRIX_MAT_PATH
+    real_mat = const.DISTANCE_MATRIX_MAT_PATH
 
-    def load_matrix(self):
-        return sio.loadmat(self.mat_path)
+    def load_matrix(self, filepath=const.MDS_DISTANCE_MATRIX_MAT_PATH):
+        return sio.loadmat(filepath)
 
 exec_time = 0
 exec_time -= time.time()
 loadMatrix = LoadMatrix()
-disMat_struct = loadMatrix.load_matrix()
+mds_dis_mat_struct = loadMatrix.load_matrix(filepath=loadMatrix.mds_mat)
 exec_time += time.time()
-print(disMat_struct)
-disMat = disMat_struct['distance_matrix']
-print(disMat.shape)
+print(mds_dis_mat_struct)
+mds_dist_mat = mds_dis_mat_struct['distance_matrix']
+print(mds_dist_mat.shape)
+print("Execution Time : " + str(exec_time) + " s")
+
+
+exec_time = 0
+exec_time -= time.time()
+loadMatrix = LoadMatrix()
+real_dis_mat_struct = loadMatrix.load_matrix(filepath=loadMatrix.real_mat)
+exec_time += time.time()
+print(mds_dis_mat_struct)
+real_dist_mat = real_dis_mat_struct['distance_matrix']
+print(real_dist_mat.shape)
 print("Execution Time : " + str(exec_time) + " s")
