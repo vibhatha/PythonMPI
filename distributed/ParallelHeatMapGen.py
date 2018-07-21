@@ -14,11 +14,7 @@ from comms import Communication
 
 class ParallelHeatMapGen:
     def initialize(self, grid_size = 10):
-        struct = {}
-        #print("Initializing ...")
-
         realMat, mdsMat = self.load_matrices()
-        # gen.pair_distances(realMat=[[1,2,3,4,5],[1,2,3,4,5]][0], mdsMat=[[5,4,3,2,1],[5,4,3,2,1]][0])
         pointsX, pointsY = self.pair_distances(realMat=realMat, mdsMat=mdsMat)
         minVal, maxVal = self.get_min_max(matrixA=realMat, matrixB=mdsMat)
         step = (maxVal - minVal) / grid_size
@@ -29,8 +25,6 @@ class ParallelHeatMapGen:
         self.mds_mat = mds_mat
 
     def load_matrices(self):
-        #print("Real Mat : " + self.real_mat)
-        #print("MDS Mat : " + self.mds_mat)
         matrix = Matrix.Matrix()
         mds_dis_mat_struct = matrix.load_matrix(filepath=matrix.mds_mat)
         mds_dist_mat = mds_dis_mat_struct['distance_matrix']
@@ -49,10 +43,6 @@ class ParallelHeatMapGen:
                 pointsX.append(x)
                 pointsY.append(y)
         return np.array(pointsX), np.array(pointsY)
-
-    def getRowByRow(self, matrix):
-        [rows, columns] = matrix.shape
-        print(matrix[0])
 
     def get_min_max(self, matrixA, matrixB):
         matA_max = np.max(matrixA)
@@ -104,7 +94,7 @@ class ParallelHeatMapGen:
                         #pointsX, pointsY, recurrence_count =self.remove_iterated_occurences(box_index, pointsX, x_val, pointsY, y_val)
                         box[box_index] += 1
                         #box[box_index] += recurrence_count
-                print("Box Count : ", box[box_index])
+                #print("Box Count : ", box[box_index])
                 box_index = box_index + 1
 
         return box
@@ -114,53 +104,55 @@ class ParallelHeatMapGen:
         comms.reduce(input=box_in, output=box_out, op=comms.mpi.SUM, dtype=comms.mpi.INT, root=0)
 
 
-exec_time = 0
-exec_time -= time.time()
-grid_size = 10
-comms = Communication.Communication()
-rank = comms.comm.Get_rank()
-size = comms.comm.Get_size()
+if len(sys.argv) == 2:
+    grid_size = int(sys.argv[1])
+    exec_time = 0
+    exec_time -= time.time()
+    #grid_size = 15
+    comms = Communication.Communication()
+    rank = comms.comm.Get_rank()
+    size = comms.comm.Get_size()
 
-const = Constant.Constant()
-para = ParallelHeatMapGen(real_mat=const.DISTANCE_MATRIX_MAT_PATH, mds_mat=const.MDS_DISTANCE_MATRIX_MAT_PATH)
-minVal, maxVal, pointsX, pointsY, step = para.initialize(grid_size=grid_size)
-#print("Old Points Shape ", pointsY.shape)
-num_of_data_per_rank = len(pointsX) / size
-box_size = grid_size
-box_out = np.zeros((box_size * box_size), dtype=int)
+    const = Constant.Constant()
+    para = ParallelHeatMapGen(real_mat=const.DISTANCE_MATRIX_MAT_PATH, mds_mat=const.MDS_DISTANCE_MATRIX_MAT_PATH)
+    minVal, maxVal, pointsX, pointsY, step = para.initialize(grid_size=grid_size)
 
-if(rank == 0):
-    x_grid_list = y_grid_list = para.gen_grid(minVal=minVal, maxVal=maxVal, step=step)
-    box_in = np.zeros((box_size * box_size), dtype=int)
-    print(str(box_out))
+    num_of_data_per_rank = len(pointsX) / size
+    box_size = grid_size
+    box_out = np.zeros((box_size * box_size), dtype=int)
+
+    if(rank == 0):
+        x_grid_list = y_grid_list = para.gen_grid(minVal=minVal, maxVal=maxVal, step=step)
+        box_in = np.zeros((box_size * box_size), dtype=int)
+
+    else:
+        x_grid_list = np.zeros(grid_size, dtype=np.float64)
+        y_grid_list = np.zeros(grid_size, dtype=np.float64)
+        recvbufX = np.empty(num_of_data_per_rank, dtype=np.float64)
+        recvbufY = np.empty(num_of_data_per_rank, dtype=np.float64)
+
+
+
+    para.bcast_grid(x_grid_list=x_grid_list, y_grid_list=y_grid_list, comms=comms)
+
+
+    recvbufX, recvbufY=para.scatter_data(pointsX=pointsX, pointsY=pointsY, num_of_data_per_rank=num_of_data_per_rank, comms=comms)
+
+    box_in = para.gen_heatmap(pointsX=recvbufX, pointsY=recvbufY, step=step, minVal=minVal, maxVal=maxVal, box_size=box_size)
+
+
+    para.get_heatmap_grid(box_in=box_in, box_out=box_out, comms=comms)
+
+    if (rank == 0):
+        print(str(box_out))
+        print(np.sum(box_out))
+        heat_grid = np.reshape(box_out, newshape=(grid_size,grid_size))
+        ax = sns.heatmap(heat_grid)
+        plt.show()
+
+    exec_time += time.time()
+    print("Total Execution Time : " + str(exec_time) +" s")
 
 else:
-    x_grid_list = np.zeros(grid_size, dtype=np.float64)
-    y_grid_list = np.zeros(grid_size, dtype=np.float64)
-    recvbufX = np.empty(num_of_data_per_rank, dtype=np.float64)
-    recvbufY = np.empty(num_of_data_per_rank, dtype=np.float64)
-
-
-
-para.bcast_grid(x_grid_list=x_grid_list, y_grid_list=y_grid_list, comms=comms)
-
-
-recvbufX, recvbufY=para.scatter_data(pointsX=pointsX, pointsY=pointsY, num_of_data_per_rank=num_of_data_per_rank, comms=comms)
-
-box_in = para.gen_heatmap(pointsX=recvbufX, pointsY=recvbufY, step=step, minVal=minVal, maxVal=maxVal, box_size=box_size)
-
-print("Rank", rank, len(x_grid_list), len(y_grid_list))
-print("Rank", rank, len(recvbufX), len(recvbufY) )
-
-para.get_heatmap_grid(box_in=box_in, box_out=box_out, comms=comms)
-
-if (rank == 0):
-    print(str(box_out))
-    print(np.sum(box_out))
-    heat_grid = np.reshape(box_out, newshape=(grid_size,grid_size))
-    ax = sns.heatmap(heat_grid, annot=True, fmt="d")
-
-    plt.show()
-
-exec_time += time.time()
-print("Total Execution Time : " + str(exec_time) +" s")
+    print(sys.argv)
+    print("Usage : mpirun -n <no_of_cores> python ParallelHeatMapGen.py <grid_size>")
