@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Matrix Loading &mdash; PythonMPI 1.0.0 documentation</title>
+    <title>HAET MAP GENERATION &mdash; PythonMPI 1.0.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,8 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="PythonMPI 1.0.0 documentation" href="../index.html" />
-    <link rel="next" title="HAET MAP GENERATION" href="heatmap.html" />
-    <link rel="prev" title="Welcome to PythonMPI’s documentation!" href="../index.html" />
+    <link rel="prev" title="Matrix Loading" href="matrix_load.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -38,14 +37,21 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="matrix-loading">
-<h1>Matrix Loading<a class="headerlink" href="#matrix-loading" title="Permalink to this headline">¶</a></h1>
-<p># Matrix Loading</p>
-<p>## CSV vs SCIPY LoadMat</p>
-<p>The scipy matrix loading mechanism is much faster than reading a typical CSV file.</p>
-<p>Time to load a 2400 x 2400 matrix:</p>
-<p>CSV Matrix Loading   = 12.4180660248 s
-Scipy Matrix Loading = 0.0159780979156 s</p>
+  <div class="section" id="haet-map-generation">
+<h1>HAET MAP GENERATION<a class="headerlink" href="#haet-map-generation" title="Permalink to this headline">¶</a></h1>
+<p># HAET MAP GENERATION</p>
+<p>## Sequential Generation</p>
+<ol class="arabic simple">
+<li>25x25 = Exec Time : 1416.51361084</li>
+<li>10x10 = Exec Time : 238.115354776</li>
+<li>15x15 = Exec Time : 532.976430893</li>
+</ol>
+<p>## Parallel Generation
+1. 10x10   = Execution Time : 78.9649090767 s
+2. 15x15   = Execution Time : 199.766344786 s
+3. 25x25   = Execution Time : 497.969747066 s
+4. 50x50   =
+5. 100x100 =</p>
 </div>
 
 
@@ -57,15 +63,14 @@ Scipy Matrix Loading = 0.0159780979156 s</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to PythonMPI&#8217;s documentation!</a></li>
-      <li>Next: <a href="heatmap.html" title="next chapter">HAET MAP GENERATION</a></li>
+      <li>Previous: <a href="matrix_load.html" title="previous chapter">Matrix Loading</a></li>
   </ul></li>
 </ul>
 </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/io/matrix_load.txt"
+      <li><a href="../_sources/io/heatmap.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -94,7 +99,7 @@ Scipy Matrix Loading = 0.0159780979156 s</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
       
       |
-      <a href="../_sources/io/matrix_load.txt"
+      <a href="../_sources/io/heatmap.txt"
           rel="nofollow">Page source</a>
     </div>
 

@@ -9,9 +9,10 @@ Welcome to PythonMPI's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 2   
    
    io/matrix_load
+   io/heatmap
 
 
 
