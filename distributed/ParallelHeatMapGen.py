@@ -7,6 +7,7 @@ import numpy as np
 import seaborn as sns;
 sns.set()
 import time
+import math
 from comms import Communication
 
 
@@ -69,6 +70,7 @@ class ParallelHeatMapGen:
         comms.scatter(input=pointsY, recvbuf=recvbufY, dtype=comms.mpi.FLOAT, root=0)
         return recvbufX, recvbufY
 
+    # naive method to calculate the heat map
     def gen_heatmap(self,pointsX=[], pointsY=[], step=0.006, minVal=0, maxVal=1000, box_size=3):
         box = np.zeros((box_size*box_size), dtype=int)
         x_grid_list = []
@@ -79,7 +81,7 @@ class ParallelHeatMapGen:
         y_grid_list = x_grid_list
         box_index=0
         for y_grid_index in range(0, len(y_grid_list), 1):
-            for x_grid_index in range(0, len(x_grid_list),1):
+            for x_grid_index in range(0, len(x_grid_list), 1):
                 for x_val, y_val in zip(pointsX, pointsY):
                     x_low = x_grid_list[x_grid_index]
                     y_low = y_grid_list[y_grid_index]
@@ -95,6 +97,32 @@ class ParallelHeatMapGen:
                 #print("Box Count : ", box[box_index])
                 box_index = box_index + 1
 
+        return box
+
+    # optimized way to calculate the heatmap
+    def gen_optheatmap(self,pointsX=[], pointsY=[], step=0.006, minVal=0, maxVal=1000, box_size=3):
+        box = np.zeros((box_size*box_size), dtype=int)
+        box_index=0
+        for x_val, y_val in zip(pointsX, pointsY):
+            x_val_low = x_val - minVal
+            y_val_low = y_val - minVal
+            x_val_ratio = x_val_low / step
+            y_val_ratio = y_val_low / step
+            y_val_ratio = (y_val_ratio-1) if (y_val_ratio == box_size) else y_val_ratio
+            box_value = x_val_ratio + math.floor(y_val_ratio) * box_size
+            box_id_approx = round(box_value)
+            box_id = box_id_approx if (box_id_approx < box_value) else (box_id_approx -1)
+            #print(int(box_id))
+            box_index = int(box_id)
+            if(box_index > box_size* box_size):
+                print("x_val_ratio " + str(x_val_ratio))
+                print("y_val_low " + str(y_val_low))
+                print("y_val_ratio " + str(y_val_ratio))
+                print("Box Value " + str(box_value))
+                print("Box Round " + str(box_id_approx))
+                print(box_index ," Result ==> " + str(box_id_approx), " if " + str(box_id_approx) + " < " + str(box_value), "else " + str(box_id_approx - 1))
+                print("X_val = " + str(x_val) + ", Y_val = " + str(y_val) + "min_val " + str(minVal) + ", step : " + str(step) + ", box size : " + str(box_size))
+            box[box_index] += 1
         return box
 
 
@@ -120,7 +148,7 @@ if len(sys.argv) == 2:
     box_out = np.zeros((box_size * box_size), dtype=int)
 
     if(rank == 0):
-        x_grid_list = y_grid_list = para.gen_grid(minVal=minVal, maxVal=maxVal, step=step)
+        x_grid_list = y_grid_list = para.gen_grid(minVal=minVal, maxVal=maxVal, step=step*4)
         box_in = np.zeros((box_size * box_size), dtype=int)
 
     else:
@@ -136,23 +164,33 @@ if len(sys.argv) == 2:
 
     recvbufX, recvbufY=para.scatter_data(pointsX=pointsX, pointsY=pointsY, num_of_data_per_rank=num_of_data_per_rank, comms=comms)
 
-    box_in = para.gen_heatmap(pointsX=recvbufX, pointsY=recvbufY, step=step, minVal=minVal, maxVal=maxVal, box_size=box_size)
+    box_in = para.gen_optheatmap(pointsX=recvbufX, pointsY=recvbufY, step=step, minVal=minVal, maxVal=maxVal, box_size=box_size)
 
 
     para.get_heatmap_grid(box_in=box_in, box_out=box_out, comms=comms)
 
     if (rank == 0):
-        print(str(box_out))
-        print(np.sum(box_out))
-        print(box_out.shape)
+        #print(str(box_out))
+        #print(np.sum(box_out))
+        #print(box_out.shape)
         box_out = np.reshape(box_out, newshape=(grid_size,grid_size))
         #box_out = np.fliplr(box_out)
         box_out = np.flipud(box_out)
         heat_grid = box_out
+
+        plot_step = round(step,2)*math.sqrt(grid_size)/4
+        print(minVal, round(maxVal + plot_step,2), plot_step)
+        xlabels = np.arange(minVal, round(maxVal + plot_step, 2), plot_step)
+        ylabels = np.flipud(xlabels)
+        print(xlabels)
+        print(len(xlabels))
         ax = sns.heatmap(heat_grid)
+        ax.set_xticklabels(xlabels, rotation=40, ha="right")
+        ax.set_yticklabels(ylabels, rotation=40, ha="right")
         figure = ax.get_figure()
-        figure.savefig("figures/phmg_"+str(grid_size)+"X"+str(grid_size)+".png")
-        #plt.show()
+        figure.savefig("figures/opt_phmg_"+str(grid_size)+"X"+str(grid_size)+".png")
+        plt.tight_layout()
+        plt.show()
 
     exec_time += time.time()
     print("Total Execution Time : " + str(exec_time) +" s")
