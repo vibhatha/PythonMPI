@@ -1,12 +1,10 @@
 import sys
-
 sys.path.append('/home/vibhatha/github/bio/PythonMPI')
 from matrix import Matrix
 from api import Constant
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns;
-
 sns.set()
 import time
 from comms import Communication
@@ -146,9 +144,15 @@ if len(sys.argv) == 2:
     if (rank == 0):
         print(str(box_out))
         print(np.sum(box_out))
-        heat_grid = np.reshape(box_out, newshape=(grid_size,grid_size))
+        print(box_out.shape)
+        box_out = np.reshape(box_out, newshape=(grid_size,grid_size))
+        #box_out = np.fliplr(box_out)
+        box_out = np.flipud(box_out)
+        heat_grid = box_out
         ax = sns.heatmap(heat_grid)
-        plt.show()
+        figure = ax.get_figure()
+        figure.savefig("figures/phmg_"+str(grid_size)+"X"+str(grid_size)+".png")
+        #plt.show()
 
     exec_time += time.time()
     print("Total Execution Time : " + str(exec_time) +" s")
