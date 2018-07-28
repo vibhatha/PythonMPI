@@ -25,11 +25,11 @@ class ParallelHeatMapGen:
 
     def load_matrices(self):
         matrix = Matrix.Matrix()
-        mds_dis_mat_struct = matrix.load_matrix(filepath=matrix.mds_mat)
+        mds_dis_mat_struct = matrix.load_matrix(filepath=matrix.mds_9556_mat)
         mds_dist_mat = mds_dis_mat_struct['distance_matrix']
 
         matrix = Matrix.Matrix()
-        real_dis_mat_struct = matrix.load_matrix(filepath=matrix.real_mat)
+        real_dis_mat_struct = matrix.load_matrix(filepath=matrix.real_9556_mat)
         real_dist_mat = real_dis_mat_struct['distance_matrix']
         return real_dist_mat, mds_dist_mat
 
@@ -140,7 +140,7 @@ if len(sys.argv) == 2:
     size = comms.comm.Get_size()
 
     const = Constant.Constant()
-    para = ParallelHeatMapGen(real_mat=const.DISTANCE_MATRIX_MAT_PATH, mds_mat=const.MDS_DISTANCE_MATRIX_MAT_PATH)
+    para = ParallelHeatMapGen(real_mat=const.DISTANCE_MATRIX_9556_MAT_PATH, mds_mat=const.MDS_9556_DISTANCE_MATRIX_MAT_PATH)
     minVal, maxVal, pointsX, pointsY, step = para.initialize(grid_size=grid_size)
 
     num_of_data_per_rank = len(pointsX) / size
@@ -171,7 +171,7 @@ if len(sys.argv) == 2:
 
     if (rank == 0):
         #print(str(box_out))
-        #print(np.sum(box_out))
+        print(np.sum(box_out))
         #print(box_out.shape)
         box_out = np.reshape(box_out, newshape=(grid_size,grid_size))
         #box_out = np.fliplr(box_out)
@@ -192,7 +192,7 @@ if len(sys.argv) == 2:
         ax.set_xticklabels(xlabels, rotation=90, ha="right")#, rotation=40, ha="right" can be used with ax.set_xticklabels()
         ax.set_yticklabels(ylabels, rotation=0, ha="right")
         figure = ax.get_figure()
-        figure.savefig("figures/opt_phmg_"+str(grid_size)+"X"+str(grid_size)+".png")
+        figure.savefig("figures/blm_opt_phmg_"+str(grid_size)+"X"+str(grid_size)+".png")
         plt.tight_layout()
         plt.show()
 
